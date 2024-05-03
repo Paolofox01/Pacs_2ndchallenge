@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
-#include "algebra.hpp"
+#include "Matrix_Impl.hpp"
 #include <string>
 #include <chrono.hpp>
 #include "json.hpp"
@@ -19,11 +19,12 @@ int main(int argc, char *argv[])
         nomeFile = argv[1];
     }
 
-    algebra::Matrix<double, algebra::order::row> Mat(nomeFile);
+    algebra::Matrix<double, algebra::order::column> Mat(nomeFile);
 
     std::vector<double> vec(Mat.cols(), 1);
 
     std::vector<double> res(Mat.rows(), 0);
+    
     Timings::Chrono     clock1;
     clock1.start();
     

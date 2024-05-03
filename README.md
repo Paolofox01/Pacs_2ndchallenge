@@ -2,7 +2,9 @@
 
 ## Content
 
-`algebra.hpp` -> implementation of a class that stores sparse matrixes in dynamic or compressed form, either with Row-major or Column-major ordering
+`algebra.hpp` -> definition of a class that stores sparse matrixes in dynamic or compressed form, either with Row-major or Column-major ordering
+
+`Matrix_Impl.hpp` -> implementaation of the members of algebra.hpp
 
 `main.cpp` -> reads a matrix in .mtx format and multiplies it with a vector of the right dimension fillend with ones using both the dynamic and compressed form, printing the time needed for each computation
 
