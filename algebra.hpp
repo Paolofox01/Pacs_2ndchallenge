@@ -70,6 +70,8 @@ namespace algebra {
          */
         Matrix (std::size_t const & rows, std::size_t const & cols) : nrows(rows), ncols(cols) { compressed = false;}
         
+        Matrix (Matrix<T, N> const & Mat) : numbers(Mat.numbers), inner_i(Mat.inner_i), outer_i(Mat.outer_i), values(Mat.values), nrows(Mat.nrows), ncols(Mat.ncols), compressed(Mat.compressed) {}
+
         /*!
          * \brief Constructor for a matrix from a .mtx file.
          * \param nomeFile Name of the .mtx file.
@@ -129,9 +131,7 @@ namespace algebra {
  * \brief Checks if the matrix is in compressed form.
  * \return True if the matrix is compressed, false otherwise.
  */
-        bool is_compressed() {
-            return compressed;
-        }
+        bool is_compressed() { return compressed; }
 
 
         //returns the number of rows in the matrix
@@ -155,7 +155,6 @@ namespace algebra {
         */
         template <NormType tipo = NormType::One>
         double norm();
-
 
         private:
 
@@ -199,7 +198,7 @@ namespace algebra {
  * \brief Computes the product of two matrices.
  * \param Mat_l Left matrix operand.
  * \param Mat_r Right matrix operand.
- * \return The resulting matrix.
+ * \return The resulting matrix(if the input matrixes are both in compressed form the result will be in compressed form too, else it will be in dynamic form).
  */
     template <typename T, order N>
     Matrix<T, N> operator* (Matrix<T, N> const & Mat_l, Matrix<T, N> const & Mat_r);

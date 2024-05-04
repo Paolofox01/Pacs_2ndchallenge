@@ -441,9 +441,20 @@ namespace algebra {
             return algebra::Matrix<T, N>(0, 0);
         }    
 
+        //to compute the multiplication with one matrix in compressed form and the other in dynamic form we use them both in compressed form
+
         if( Mat_l.compressed + Mat_r.compressed == 1) {
-            std::cerr << "not in the same form" << std::endl;
-            return algebra::Matrix<T, N>(0, 0);
+            if (Mat_l.compressed)
+            { 
+                Matrix<T,N> Mat_new = Mat_l;
+                Mat_new.uncompress();
+                return Mat_new * Mat_r;
+            } else {
+                Matrix<T,N> Mat_new = Mat_r;
+                Mat_new.uncompress();
+                return Mat_l * Mat_new;
+            }
+            
         }    
         
         if(Mat_l.compressed && Mat_r.compressed ) {
