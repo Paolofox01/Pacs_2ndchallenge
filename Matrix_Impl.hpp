@@ -1,6 +1,6 @@
 #ifndef MATRIXIMPL_H
 #define MATRIXIMPL_H
-
+// clang-format off
 #include "algebra.hpp"
 
 namespace algebra {
@@ -13,6 +13,8 @@ namespace algebra {
                 return l < r;
             } else {
                 // If CSC, order elements based on the column index first, then compare the row index if on the same column
+                //@note A trick using std::tie can be used to simplify the code
+                // return std::tie(l.at(1), l.at(0)) < std::tie(r.at(1), r.at(0));
                 if (l.at(1) < r.at(1))
                     return true;
                 else if (l.at(1) > r.at(1))
@@ -35,6 +37,7 @@ namespace algebra {
             if (!file.is_open()) {
                 std::cerr << "couldn't open file " << nomeFile << std::endl;
             }
+ //@note It is better to read a line with getline and then process the string also to eliminate comment lines
 
             while (file.peek() == '%') file.ignore(2048, '\n');
 
@@ -88,6 +91,7 @@ namespace algebra {
 
             nrows = rows;
             ncols = cols;
+            //@note OK, but if the matrix was originally compresses I would recompress it again. To avoid confusion from the user.
         }
 
     // & operator () to modify the elements of the matrix
@@ -101,6 +105,9 @@ namespace algebra {
                 //if compressed return the address to the element if !=0, else print an error( can't modify a 0 element if compressed)          
                 
                 if (compressed) {
+                    //@note I don't understand what you are doing. If the matrix is rowwise ordered
+                    // you should look for for each row i all the elements in inner_i[outer_i[i]] to inner_i[outer_i[i+1\] 
+                    // and check if the column index is equal to j. If the matrix is column oriented the role of inner_i and outer_i is reversed.
                     for (auto k = inner_i[i*(1-N) + j * N]; k < inner_i[i*(1-N) + j * N + 1]; k++){
                         if(outer_i[k] == i * N + j * (1-N))
                             return values[k]; 
@@ -131,7 +138,7 @@ namespace algebra {
             if(i < nrows && j < ncols ) {
                 
                 if (compressed) {
-                    
+                    //@note same comment as before
                     for (auto k = inner_i[i*(1-N) + j * N]; k < inner_i[i*(1-N) + j * N + 1]; k++)
                         if(outer_i[k] == i*N + j * (1-N))
                             return values[k]; }
@@ -154,7 +161,7 @@ namespace algebra {
     void Matrix<T, N>::compress()  {
 
             if(compressed) {
-                std::cerr << "already compressed" << std::endl;
+                std::cerr << "already compressed" << std::endl;//@note it is not necessarily an error
                 return;
             }
             
@@ -180,7 +187,7 @@ namespace algebra {
                 }
                 
                 for(std::size_t i = 0; i < nrows+1; i++) {
-
+//@note no need to use distance. You can exploit the fact theat the map is ordered, so you can extract row by row (or col by col if the matrix is column oriented) the elements
                     inner_i[i] = std::distance(iniz, numbers.lower_bound(std::array<std::size_t,2>{i, 0}));         
                     
             } 
@@ -217,7 +224,7 @@ namespace algebra {
     void Matrix<T, N>::uncompress()  {
             
             if(!compressed) {
-                std::cerr << "already uncompressed" << std::endl;
+                std::cerr << "already uncompressed" << std::endl;//@note not necessarily an error
                 return;
             }
 
@@ -238,6 +245,7 @@ namespace algebra {
             }
 
             //free the memory
+            //@note you are not freeing the memory with clear() on a vector. You should use shrink_to_fit() after the clear() to free the memory
             inner_i.clear();
             outer_i.clear();
             values.clear();
@@ -251,8 +259,9 @@ namespace algebra {
     // Computes the norm of the matrix
     template<typename T, order N>
     template <NormType tipo>
-    double Matrix<T, N>::norm(){
-            
+    double Matrix<T, N>::norm(){ //@note This method should be const. It does not change the state of the matrix!
+            //@note Nice having this method working also for the uncompressed case. Yet normally for this high lever
+            // method I would expect to have a compressed matrix. 
             //apply the formulas to compute the norm to the matrix based on the type of norm and matrix ordering
             if constexpr (N == order::row) {
             if constexpr (tipo == NormType::One) {
@@ -297,13 +306,14 @@ namespace algebra {
                 if(!compressed) {
                     for (auto [ key , value ] : numbers)
                         {
+                            //@note don't use pow just to elevete to 2. Use value * value (less expensive)
                             res += std::pow(std::abs(value), 2);
                         }
                     return std::sqrt(res);
                     
                 } else {
                     for (auto i : values) {
-                        res += std::pow(std::abs(i), 2);
+                        res += std::pow(std::abs(i), 2);//@note same comment as before. Moreover why taking abs when you are squaring?
                     }
 
                     return std::sqrt(res);

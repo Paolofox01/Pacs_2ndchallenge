@@ -1,6 +1,6 @@
 #ifndef ALGEBRA_H
 #define ALGEBRA_H
-
+// clang-format off
 #include <map>
 #include <array>
 #include <vector>
@@ -68,8 +68,9 @@ namespace algebra {
          * \param rows Number of rows.
          * \param cols Number of columns.
          */
-        Matrix (std::size_t const & rows, std::size_t const & cols) : nrows(rows), ncols(cols) { compressed = false;}
+        Matrix (std::size_t const & rows, std::size_t const & cols) : nrows(rows), ncols(cols) { compressed = false;}//@note why not initialise compress in the initialization list??
         
+        //@note not needed. You can use the syntethised one. Don't define copy or assignement operator if the syntethised ones are ok
         Matrix (Matrix<T, N> const & Mat) : numbers(Mat.numbers), inner_i(Mat.inner_i), outer_i(Mat.outer_i), values(Mat.values), nrows(Mat.nrows), ncols(Mat.ncols), compressed(Mat.compressed) {}
 
         /*!
